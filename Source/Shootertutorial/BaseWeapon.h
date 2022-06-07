@@ -9,6 +9,16 @@
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class EWeaponType :uint8 {
+	EWT_Submachinegun UMETA(DisplayName="Sumachinegun"),
+	EWT_ArGun       UMETA(DisplayName="Argun"),
+	EWT_Default    UMETA(DisplayName="default")
+};
+
+
+
 UCLASS()
 class SHOOTERTUTORIAL_API ABaseWeapon : public ABaseitem
 {
@@ -46,5 +56,14 @@ public:
 
 
 	//@Ammo counting ends here
+
+	//@WEapontype enum specs
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "weapontype", meta = (AllowPrivateAccess = "true"))
+	EWeaponType Eweapontype;
+
+public:
+	FORCEINLINE EWeaponType getweapontype() const { return Eweapontype; }
+	//@weapontype enum ends here
 
 };

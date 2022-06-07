@@ -168,6 +168,9 @@ void AShootercharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("SelectWeapon", IE_Pressed, this, &AShootercharacter::selectweaponpressed);
 	PlayerInputComponent->BindAction("SelectWeapon", IE_Released, this, &AShootercharacter::selectweaponreleased);
 
+	//fuctionality of reloading the weapon
+	PlayerInputComponent->BindAction("Reloadgun", IE_Pressed, this, &AShootercharacter::reloadbuttonpressed);
+
 
 }
 
@@ -609,6 +612,7 @@ void AShootercharacter::autofirereset()
 	}
 	else {
 		//reload to be happen
+		Reloadweapon();
 	}
 }
 
@@ -625,4 +629,23 @@ bool AShootercharacter::WeaponhasAmmo()
 	return EquippedWeapon->getAmmoavaliable()>0;
 }
 //.........................................................................
+
+
+//@Reload
+void AShootercharacter::reloadbuttonpressed() {
+	Reloadweapon();
+}
+
+void AShootercharacter::Reloadweapon() {
+	if (Ecombatfirestate != ECombatfirestate::ECFS_Unoccupied) return;
+	UAnimInstance* Anim = GetMesh()->GetAnimInstance();
+	FName sectionname = TEXT("Reloadsmg");
+	if (Anim && Reloadmontage) {
+		Anim->Montage_Play(Reloadmontage, 1.0f);
+		Anim->Montage_JumpToSection(sectionname);
+	}
+}
+
+
+//.............................reload end
 

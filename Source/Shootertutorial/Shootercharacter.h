@@ -286,4 +286,15 @@ public:
 	void firingmontageplay();
 	//....................................end
 
+
+
+	//@reload the gun func start
+	void reloadbuttonpressed();
+	void Reloadweapon();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "reload")
+	UAnimMontage* Reloadmontage;
+
+	//.........@reload end
+
 };//for stting cross hair screen x will be integer positive not negative and same for screen y

@@ -9,7 +9,8 @@ ABaseWeapon::ABaseWeapon():weaponfalling(false),fallresettime(0.2f)
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-
+	//initialize the weapon type
+	Eweapontype = EWeaponType::EWT_Submachinegun;
 }
 
 
