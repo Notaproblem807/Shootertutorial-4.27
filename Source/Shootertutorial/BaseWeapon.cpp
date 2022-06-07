@@ -8,9 +8,16 @@ ABaseWeapon::ABaseWeapon():weaponfalling(false),fallresettime(0.2f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	//ammo gun has initially
+	Ammoavailable = 0;
+	//ammo maximun can been have
+	Magammocapacity = 30;
 	//initialize the weapon type
 	Eweapontype = EWeaponType::EWT_Submachinegun;
+	//initialize Ammotype
+	ammotype = EAmmotype::EAT_9mm;
+	//montage name for reloading section
+	Montagesectionname = TEXT("Reloadsmg");
 }
 
 
@@ -68,4 +75,11 @@ void ABaseWeapon::Decrementammoavaliable()
 	else {
 		--Ammoavailable;
 	}
+}
+
+//@reloadfinish in shooter to increase the ammo count
+void ABaseWeapon::Reloadammocount(int32 Amount)
+{
+	checkf(Ammoavailable + Amount <= Magammocapacity, TEXT("Your are existing capacity of holding Ammo"));
+	Ammoavailable += Amount;
 }

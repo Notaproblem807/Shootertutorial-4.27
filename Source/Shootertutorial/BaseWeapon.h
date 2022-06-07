@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Baseitem.h"
+#include "Ammotype.h"
 #include "BaseWeapon.generated.h"
 
 /**
@@ -12,7 +13,7 @@
 
 UENUM(BlueprintType)
 enum class EWeaponType :uint8 {
-	EWT_Submachinegun UMETA(DisplayName="Sumachinegun"),
+	EWT_Submachinegun UMETA(DisplayName="Submachinegun"),
 	EWT_ArGun       UMETA(DisplayName="Argun"),
 	EWT_Default    UMETA(DisplayName="default")
 };
@@ -53,9 +54,15 @@ public:
 	FORCEINLINE int32 getAmmoavaliable() const { return Ammoavailable;}
 	 
 	void Decrementammoavaliable();
-
-
 	//@Ammo counting ends here
+	
+
+	//capacity of gun to hold and bullet and increse while reloading
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Maxammocancarry", meta = (AllowPrivateAccess = "true"))
+	int32 Magammocapacity;
+
+	void Reloadammocount(int32 Amount);
+	//......ends capacity
 
 	//@WEapontype enum specs
 private:
@@ -65,5 +72,19 @@ private:
 public:
 	FORCEINLINE EWeaponType getweapontype() const { return Eweapontype; }
 	//@weapontype enum ends here
+
+	//@Ammotype weapon holds
+private:
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="weapon|Ammotype", meta = (AllowPrivateAccess = "true"))
+	EAmmotype ammotype;
+public:
+	FORCEINLINE EAmmotype getammotype() const { return ammotype; }
+
+	//@Ammotype ends
+
+	//montage section for diffeernet weapon
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="montagesectionname")
+	FName Montagesectionname;
+	//..........end
 
 };

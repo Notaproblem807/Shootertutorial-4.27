@@ -4,16 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Ammotype.h"
 #include "Shootercharacter.generated.h"
 
-//eneum for counting the ammo for the player
 
-UENUM(BlueprintType)
-enum class EAmmotype :uint8 {
-	EAT_9mm UMETA(DisplayName="9mm"),
-	EAT_Ar UMETA(DisplayName="5mm"),
-	EAT_Max UMETA(DisplayName="default")
-};
 
 UENUM(BlueprintType)
 enum class ECombatfirestate :uint8 {
@@ -295,6 +289,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "reload")
 	UAnimMontage* Reloadmontage;
 
+	UFUNCTION(BlueprintCallable)
+	void Finishreloading();
+
 	//.........@reload end
+
+	//@Ammo check for having ammorto reload
+	bool carrysameammo();
+	//@Ammocheck ends.............
+
+
 
 };//for stting cross hair screen x will be integer positive not negative and same for screen y

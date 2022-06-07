@@ -91,8 +91,8 @@ AShootercharacter::AShootercharacter():Baseturnrate(45.f),Baselookuprate(45.f)
 	CameraUpwardDistance = 70.f;
 
 	//ammomap initaialize @Ammomap
-	starting9mmcount = 80;
-	starting5mmcount = 45;
+	starting9mmcount = 100;
+	starting5mmcount = 80;
 	//..............................
 
 	//ecfs intialize @ECFS
@@ -636,16 +636,55 @@ void AShootercharacter::reloadbuttonpressed() {
 	Reloadweapon();
 }
 
+
+
 void AShootercharacter::Reloadweapon() {
 	if (Ecombatfirestate != ECombatfirestate::ECFS_Unoccupied) return;
+	if (EquippedWeapon == nullptr) return;
 	UAnimInstance* Anim = GetMesh()->GetAnimInstance();
-	FName sectionname = TEXT("Reloadsmg");
-	if (Anim && Reloadmontage) {
-		Anim->Montage_Play(Reloadmontage, 1.0f);
-		Anim->Montage_JumpToSection(sectionname);
+	if (carrysameammo()) {
+		Ecombatfirestate = ECombatfirestate::ECFS_reloadstate;
+		//FName sectionname = TEXT("Reloadsmg");
+		if (Anim && Reloadmontage) {
+			Anim->Montage_Play(Reloadmontage, 1.0f);
+			Anim->Montage_JumpToSection(EquippedWeapon->Montagesectionname);
+		}
 	}
 }
-
-
 //.............................reload end
+
+
+void AShootercharacter::Finishreloading() {
+	Ecombatfirestate = ECombatfirestate::ECFS_Unoccupied;
+	if (EquippedWeapon == nullptr)return;
+	EAmmotype ammosameinequip = EquippedWeapon->getammotype();
+	if (AmmoMap.Contains(ammosameinequip)) {
+		int32 Noammocarried = AmmoMap[ammosameinequip];
+		UE_LOG(LogTemp, Warning, TEXT("ammocarried % i"), Noammocarried);
+		int32 spaceavailabletocarry = EquippedWeapon->Magammocapacity - EquippedWeapon->getAmmoavaliable();
+		if (spaceavailabletocarry > Noammocarried) {
+			EquippedWeapon->Reloadammocount(Noammocarried);
+			Noammocarried = 0;
+			AmmoMap.Add(ammosameinequip, Noammocarried);
+		}
+		else {
+			EquippedWeapon->Reloadammocount(spaceavailabletocarry);
+			Noammocarried -= spaceavailabletocarry;
+			AmmoMap.Add(ammosameinequip, Noammocarried);
+		}
+	}
+	
+}
+
+bool AShootercharacter::carrysameammo()
+{
+	if (EquippedWeapon == nullptr) {
+		return false;
+	}
+	EAmmotype ammowithcharacter = EquippedWeapon->getammotype();
+	if (AmmoMap.Contains(ammowithcharacter)) {
+		return AmmoMap[ammowithcharacter] > 0;
+	}
+	return false;
+}
 
