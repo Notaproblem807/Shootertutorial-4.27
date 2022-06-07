@@ -15,6 +15,17 @@ enum class EAmmotype :uint8 {
 	EAT_Max UMETA(DisplayName="default")
 };
 
+UENUM(BlueprintType)
+enum class ECombatfirestate :uint8 {
+	ECFS_Unoccupied UMETA(DisplayName="unoccupiedstate"),
+	ECFS_Firetimerinprogress UMETA(DisplayName="firetimeprogress"),//its the timer set to fire again bullet
+	ECFS_reloadstate UMETA(DisplayName="reloadstate"),
+
+	ECFS_Max UMETA(DisplayName="default")
+};
+
+
+
 UCLASS()
 class SHOOTERTUTORIAL_API AShootercharacter : public ACharacter
 {
@@ -236,7 +247,7 @@ public:
 	//timer to reset auto fire
 	FTimerHandle Autofiretimer;
 	//auto fire bool
-	bool bshouldfire;
+	//noneed bool bshouldfire;
 	//delay for timer
 	float autofireradelay;
 
@@ -260,4 +271,19 @@ protected:
 	//@Ammo count func
 	bool WeaponhasAmmo();
 	//...................
+
+	//@ECFS
+	//enum of ECFS
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="enumCombatstate")
+	ECombatfirestate Ecombatfirestate;
+
+	//@ECFS..........end
+
+	//make shooting func easily readable
+	void gunshotandparticle();
+	void getvalsubshootfunc();
+	void firingmontageplay();
+	//....................................end
+
 };//for stting cross hair screen x will be integer positive not negative and same for screen y

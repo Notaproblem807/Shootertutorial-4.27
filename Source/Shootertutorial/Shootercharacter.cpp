@@ -80,7 +80,6 @@ AShootercharacter::AShootercharacter():Baseturnrate(45.f),Baselookuprate(45.f)
 	Shootspreadtime = 0.05f;
 	//auto firing system initialize
 	bfirebuttonpress = false;
-	bshouldfire = false;
 	//it should be higher than crosshair spred delay timer
 	autofireradelay = 0.1f;
 
@@ -95,6 +94,9 @@ AShootercharacter::AShootercharacter():Baseturnrate(45.f),Baselookuprate(45.f)
 	starting9mmcount = 80;
 	starting5mmcount = 45;
 	//..............................
+
+	//ecfs intialize @ECFS
+	Ecombatfirestate = ECombatfirestate::ECFS_Unoccupied;
 }
 
 // Called when the game starts or when spawned
@@ -323,38 +325,28 @@ void AShootercharacter::pickupprop(ABaseitem* itemseen)
 	
 }
 //.....................................................................
-void AShootercharacter::Shootingfunc()
-{
-	if (EquippedWeapon == nullptr) return;
+void AShootercharacter::gunshotandparticle() {
 	if (gunshotsound) {
 		UGameplayStatics::PlaySound2D(this, gunshotsound);
 	}
+	
+}
+
+void AShootercharacter::getvalsubshootfunc() {
 	//for spawnemitter function parameters
-	const USkeletalMeshSocket* Barelsocket =EquippedWeapon->getMeshgame()->GetSocketByName("BarrelSocket");
+	const USkeletalMeshSocket* Barelsocket = EquippedWeapon->getMeshgame()->GetSocketByName("BarrelSocket");
 	const FTransform Bareltransform = Barelsocket->GetSocketTransform(EquippedWeapon->getMeshgame());
 	if (gunshotparticle) {
 		//to spawn the particle in socket place
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), gunshotparticle,Bareltransform);
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), gunshotparticle, Bareltransform);
 	}
-	if (montagegunfire) {
-		UAnimInstance* Animinstance=GetMesh()->GetAnimInstance();
-		if (Animinstance) {
-			Animinstance->Montage_Play(montagegunfire, 1.0f);
-			Animinstance->Montage_JumpToSection(FName("Fire"));
-		}
-	}
-	//@Ammocount
-	if (EquippedWeapon) {
-		EquippedWeapon->Decrementammoavaliable();
-	}
-	//...................@Ammocount end 
-	//pass to function and get the value
 	FVector Beamendpoint;
+	//pass to function and get the value
 	if (subshootingfunc(Bareltransform.GetLocation(), Beamendpoint)) {
 
 		//hit pointed in object to spawn the particle
 		if (gunshotimpactparticle) {
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), gunshotimpactparticle,Beamendpoint);
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), gunshotimpactparticle, Beamendpoint);
 		}
 
 
@@ -368,6 +360,33 @@ void AShootercharacter::Shootingfunc()
 			}
 		}
 	}
+}
+
+void AShootercharacter::firingmontageplay() {
+	if (montagegunfire) {
+		UAnimInstance* Animinstance = GetMesh()->GetAnimInstance();
+		if (Animinstance) {
+			Animinstance->Montage_Play(montagegunfire, 1.0f);
+			Animinstance->Montage_JumpToSection(FName("Fire"));
+		}
+	}
+}
+
+
+void AShootercharacter::Shootingfunc()
+{
+	if (EquippedWeapon == nullptr) return;
+	if (Ecombatfirestate != ECombatfirestate::ECFS_Unoccupied) return;
+	if (WeaponhasAmmo()) {
+		gunshotandparticle();
+	    getvalsubshootfunc();
+		firingmontageplay();
+		//to shoot
+		shouldfiresetter();
+	}
+	//@Ammocount
+	EquippedWeapon->Decrementammoavaliable();
+	//...................@Ammocount end 
 	//set firing to true to tweak crosshair
 	crossspreadfiring();
 }
@@ -560,9 +579,9 @@ void AShootercharacter::crossspreaddef()
 //automatic firing bullet prop
 void AShootercharacter::Firebuttonpressed()
 {
+	bfirebuttonpress = true;
 	if (WeaponhasAmmo()) {
-		bfirebuttonpress = true;
-		shouldfiresetter();
+		Shootingfunc();
 	}
 }
 
@@ -573,21 +592,23 @@ void AShootercharacter::Firebuttonreleased()
 
 void AShootercharacter::shouldfiresetter()
 {
-	bshouldfire = true;
-	if (bshouldfire) {
-		Shootingfunc();
-		UE_LOG(LogTemp, Warning, TEXT("now"));
-		GetWorldTimerManager().SetTimer(Autofiretimer, this, &AShootercharacter::autofirereset,autofireradelay);
-	}
+	Ecombatfirestate = ECombatfirestate::ECFS_Firetimerinprogress;
+	//UE_LOG(LogTemp, Warning, TEXT("now"));
+	GetWorldTimerManager().SetTimer(Autofiretimer, this, &AShootercharacter::autofirereset,autofireradelay);
 }
 
 void AShootercharacter::autofirereset()
 {
-	bshouldfire = false;
-	UE_LOG(LogTemp, Warning, TEXT("now in reset"));
-	if (bfirebuttonpress) {
-		UE_LOG(LogTemp, Warning, TEXT("later in reset"));
-		shouldfiresetter();
+	//UE_LOG(LogTemp, Warning, TEXT("now in reset"));
+	Ecombatfirestate = ECombatfirestate::ECFS_Unoccupied;
+	//UE_LOG(LogTemp, Warning, TEXT("later in reset"));
+	if (WeaponhasAmmo()) {
+		if (bfirebuttonpress) {
+			Shootingfunc();
+		}
+	}
+	else {
+		//reload to be happen
 	}
 }
 
