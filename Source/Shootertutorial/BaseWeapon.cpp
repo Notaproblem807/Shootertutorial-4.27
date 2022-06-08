@@ -18,6 +18,9 @@ ABaseWeapon::ABaseWeapon():weaponfalling(false),fallresettime(0.2f)
 	ammotype = EAmmotype::EAT_9mm;
 	//montage name for reloading section
 	Montagesectionname = TEXT("Reloadsmg");
+
+	//@Grab and replace the clip in gun for reloading animation take place
+	Clipbonename = TEXT("smg_clip");
 }
 
 

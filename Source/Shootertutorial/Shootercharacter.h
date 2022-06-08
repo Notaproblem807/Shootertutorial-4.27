@@ -299,5 +299,30 @@ public:
 	//@Ammocheck ends.............
 
 
+	//@Grab and replace the clip in gun for reloading animation take place
+	UFUNCTION(BlueprintCallable)
+	void Grabclip();
+
+	UFUNCTION(BlueprintCallable)
+	void Replaceclip();
+
+	FTransform Clipbone;
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grabandreleaseclip", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* Handclipcomponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grabandreleaseclip", meta = (AllowPrivateAccess = "true"))
+	FName lefthandbonename;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grabandreleaseclip", meta = (AllowPrivateAccess = "true"))
+	FVector camarmrotater;
+
+public:
+	FORCEINLINE USceneComponent* getHandclipcomponent() const { return Handclipcomponent; }
+	FORCEINLINE FName getlefthandbonename() const { return lefthandbonename; }
+	//@Grab and replace ends
+
+
 
 };//for stting cross hair screen x will be integer positive not negative and same for screen y

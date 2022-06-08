@@ -97,6 +97,13 @@ AShootercharacter::AShootercharacter():Baseturnrate(45.f),Baselookuprate(45.f)
 
 	//ecfs intialize @ECFS
 	Ecombatfirestate = ECombatfirestate::ECFS_Unoccupied;
+
+
+
+	//@Grab and replace the clip in gun for reloading animation take place
+	lefthandbonename=TEXT("Hand_L");
+	Handclipcomponent = CreateDefaultSubobject<USceneComponent>(TEXT("Handclipcomponnet"));
+	camarmrotater= FVector(0.f, -50.f, 80.f);
 }
 
 // Called when the game starts or when spawned
@@ -687,4 +694,32 @@ bool AShootercharacter::carrysameammo()
 	}
 	return false;
 }
+
+
+//@Grab and replace the clip in gun for reloading animation take place
+
+void AShootercharacter::Grabclip()
+{
+	if (EquippedWeapon == nullptr)return;
+	if (Handclipcomponent == nullptr)return;
+	int32 clipboneindex=EquippedWeapon->getMeshgame()->GetBoneIndex(EquippedWeapon->Getclipbonename());
+	Clipbone=EquippedWeapon->getMeshgame()->GetBoneTransform(clipboneindex);
+
+	FAttachmentTransformRules Attachmentrules(EAttachmentRule::KeepRelative, true);
+	bool re=Handclipcomponent->AttachToComponent(GetMesh(), Attachmentrules, lefthandbonename);
+	if (re) {
+		Handclipcomponent->SetWorldTransform(Clipbone);
+		UE_LOG(LogTemp, Warning, TEXT("grab work"));
+	}
+	EquippedWeapon->Setmovingclip(true);
+	Springarm->SocketOffset = FVector(0.f, 150.f, 80.f)+camarmrotater;
+}
+
+void AShootercharacter::Replaceclip()
+{
+	EquippedWeapon->Setmovingclip(false);
+	Springarm->SocketOffset = FVector(0.f, 50.f, 80.f);
+}
+
+//@Grab and replace ends
 

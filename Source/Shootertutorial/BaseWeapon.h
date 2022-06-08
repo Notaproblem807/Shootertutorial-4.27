@@ -77,6 +77,7 @@ public:
 private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="weapon|Ammotype", meta = (AllowPrivateAccess = "true"))
 	EAmmotype ammotype;
+
 public:
 	FORCEINLINE EAmmotype getammotype() const { return ammotype; }
 
@@ -86,5 +87,20 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="montagesectionname")
 	FName Montagesectionname;
 	//..........end
+
+
+	//@Grab and replace the clip in gun for reloading animation take place
+private:
+	FName Clipbonename;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "grabandclip", meta = (AllowPrivateAccess = "true"))
+	bool bMovingclip;
+
+public:
+	FORCEINLINE FName Getclipbonename()const { return Clipbonename; }
+	FORCEINLINE void Setmovingclip(bool move) { bMovingclip = move; }
+
+	//@Grab and replace ends
+
 
 };
