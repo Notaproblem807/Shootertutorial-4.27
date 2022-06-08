@@ -163,4 +163,19 @@ public:
 
 	//......................................................//
 
+
+	//@sounds to play when equipping and equipped
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "sound|picking", meta = (AllowPrivateAccess = "true"))
+	class USoundCue* EquippedSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "sound|picked", meta = (AllowPrivateAccess = "true"))
+	class USoundCue* Equippingsound;
+
+public:
+	FORCEINLINE USoundCue* getEquippedsound() const { return EquippedSound; }
+	FORCEINLINE USoundCue* getEquippingsound() const { return Equippingsound; }
+
+	//@sounds end..................
+
 };

@@ -61,5 +61,38 @@ void UShooterAniminstance::UpdatecAnimation(float Deltatime)
 		}
 		//proerty to change the hip fire to aiming fire function
 		banimaiming = Shootercharref->baimZoom;
+		//to turn in place 
+		Turninplace();
 	}
+}
+
+void UShooterAniminstance::Turninplace()
+{
+	if (Shootercharref == nullptr)return;
+	if (speed > 0) {
+
+	}
+	else {
+		characteryawlastframe = Characteryaw;
+		Characteryaw = Shootercharref->GetActorRotation().Yaw;
+		//if (characteryawlastframe == Characteryaw) {
+
+		//}
+		//else {
+			//UE_LOG(LogTemp, Warning, TEXT("characteryawlast %f"), characteryawlastframe);
+		//}
+		const float yawoffset{ Characteryaw - characteryawlastframe };
+		Rootoffsetyaw -= yawoffset;
+		FString offsetyaw = FString::Printf(TEXT("characteryaaw:%f"),Characteryaw);
+		FString offsete = FString::Printf(TEXT("characteryaawlast:%f"),characteryawlastframe);
+		FString offsetr = FString::Printf(TEXT("rootoff:%f"),Rootoffsetyaw);
+		/*if (GEngine) {
+			GEngine->AddOnScreenDebugMessage(1,0.f, FColor::Red, offsetyaw);
+			GEngine->AddOnScreenDebugMessage(2, 0.f, FColor::Green,offsete);
+			GEngine->AddOnScreenDebugMessage(3, 0.f, FColor::Purple,offsetr);
+
+		}*/
+
+	}
+
 }

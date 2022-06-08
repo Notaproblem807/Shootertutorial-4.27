@@ -103,7 +103,7 @@ AShootercharacter::AShootercharacter():Baseturnrate(45.f),Baselookuprate(45.f)
 	//@Grab and replace the clip in gun for reloading animation take place
 	lefthandbonename=TEXT("Hand_L");
 	Handclipcomponent = CreateDefaultSubobject<USceneComponent>(TEXT("Handclipcomponnet"));
-	camarmrotater= FVector(0.f, -50.f, 80.f);
+	camarmrotater= FVector(0.f, 50.f, 80.f);
 }
 
 // Called when the game starts or when spawned
@@ -279,6 +279,10 @@ void AShootercharacter::Spawnandequip(ABaseWeapon* getWeapon)
 			//socketgun->AttachActor(getWeapon, GetMesh());
 		}
 		EquippedWeapon = getWeapon;
+		//for playing the sound cue
+		if (EquippedWeapon->getEquippedsound()) {
+			UGameplayStatics::PlaySound2D(this, EquippedWeapon->getEquippedsound());
+		}
 		//setting the enum itemstate 
 		EquippedWeapon->SetItemState(EItemState::EIS_Equipped);
 	}
@@ -290,6 +294,10 @@ void AShootercharacter::selectweaponpressed()
 	if (hititemorWeapon) {
 		//pickupprop(hititemorWeapon);
 		hititemorWeapon->Startitemcurve(this);
+		//play the equipping and in zcurve
+		if (hititemorWeapon->getEquippingsound()) {
+			UGameplayStatics::PlaySound2D(this, hititemorWeapon->getEquippingsound());
+		}
 	}
 	else {
 		//may be includeded for better gameplay
@@ -712,7 +720,7 @@ void AShootercharacter::Grabclip()
 		UE_LOG(LogTemp, Warning, TEXT("grab work"));
 	}
 	EquippedWeapon->Setmovingclip(true);
-	Springarm->SocketOffset = FVector(0.f, 150.f, 80.f)+camarmrotater;
+	Springarm->SocketOffset = FVector(0.f, -150.f,100.f)+camarmrotater;
 }
 
 void AShootercharacter::Replaceclip()

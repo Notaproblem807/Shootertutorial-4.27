@@ -44,4 +44,18 @@ public:
     // property to change hip to fire state in the animation
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Hip to fire|status")
 	bool banimaiming;
+
+
+	//@Turn in place mechanism
+	float Characteryaw;
+
+	float characteryawlastframe;
+
+	//to make  body not rotate with mouse movement
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="turninplace")
+	float Rootoffsetyaw;
+
+	void Turninplace();
+
+	//Aturn in place ends here
 };
