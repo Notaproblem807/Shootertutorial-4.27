@@ -5,9 +5,16 @@
 #include "Shootercharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 UShooterAniminstance::UShooterAniminstance() {
 	speed = 0.f;
+	//@turn in place
+	Rotationyaw = 0.f;
+	Rotationyawlastframe = 0.f;
+	Characteryaw = 0.f;
+	characteryawlastframe = 0.f;
+	Rootoffsetyaw = 0.f;
 }
 
 void UShooterAniminstance::NativeInitializeAnimation()
@@ -70,7 +77,11 @@ void UShooterAniminstance::Turninplace()
 {
 	if (Shootercharref == nullptr)return;
 	if (speed > 0) {
-
+		Rootoffsetyaw = 0.f;
+		Characteryaw = Shootercharref->GetActorRotation().Yaw;
+		characteryawlastframe = Characteryaw;
+		Rotationyaw = 0.f;
+		Rotationyawlastframe = 0.f;
 	}
 	else {
 		characteryawlastframe = Characteryaw;
@@ -82,17 +93,42 @@ void UShooterAniminstance::Turninplace()
 			//UE_LOG(LogTemp, Warning, TEXT("characteryawlast %f"), characteryawlastframe);
 		//}
 		const float yawoffset{ Characteryaw - characteryawlastframe };
+		//nomalise between the ange 180 ,-180
 		Rootoffsetyaw -= yawoffset;
+		UKismetMathLibrary::ClampAngle(Rootoffsetyaw, -180.f, 180.f);
+		//Rootoffsetyaw=UKismetMathLibrary::NormalizeAxis(Rootoffsetyaw - yawoffset);
 		FString offsetyaw = FString::Printf(TEXT("characteryaaw:%f"),Characteryaw);
 		FString offsete = FString::Printf(TEXT("characteryaawlast:%f"),characteryawlastframe);
 		FString offsetr = FString::Printf(TEXT("rootoff:%f"),Rootoffsetyaw);
-		/*if (GEngine) {
+		if (GEngine) {
 			GEngine->AddOnScreenDebugMessage(1,0.f, FColor::Red, offsetyaw);
 			GEngine->AddOnScreenDebugMessage(2, 0.f, FColor::Green,offsete);
 			GEngine->AddOnScreenDebugMessage(3, 0.f, FColor::Purple,offsetr);
 
-		}*/
-
+		}
+		//turn in 90 while moving turn the body 
+		const float trackerval{ GetCurveValue(TEXT("trackerval")) };
+		//if trackerval > 0 not  animation not running turn in anim
+		if (trackerval>0) {
+			Rotationyawlastframe = Rotationyaw;
+			Rotationyaw = GetCurveValue(TEXT("Rotationturn"));
+			//UE_LOG(LogTemp, Warning, TEXT("Rotationyaw%f"), Rotationyaw);
+			//UE_LOG(LogTemp, Warning, TEXT("Rotationyawlast%f"), Rotationyawlastframe);
+			const float Rotationyawoffset{ Rotationyaw - Rotationyawlastframe };
+			//UE_LOG(LogTemp, Warning, TEXT("Rotationyaw%f"), Rotationyaw);
+			//UE_LOG(LogTemp, Warning, TEXT("Rotationyawoffest%f"), Rotationyawoffset);
+			Rootoffsetyaw > 0.f ? Rootoffsetyaw -= Rotationyawoffset : Rootoffsetyaw += Rotationyawoffset;
+			const float ABSRootoffsetyaw{ FMath::Abs(Rootoffsetyaw) };
+			if (Rootoffsetyaw > 90.f) {
+				const float yawexcess{ ABSRootoffsetyaw - 90.f };
+				Rootoffsetyaw > 0.f ? Rootoffsetyaw -= yawexcess : Rootoffsetyaw += yawexcess;
+			}
+			UE_LOG(LogTemp, Warning, TEXT("finRotation%f"), Rootoffsetyaw);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("newRotation%f"), Rootoffsetyaw);
+		}
+		
 	}
 
 }

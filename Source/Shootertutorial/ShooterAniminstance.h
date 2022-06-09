@@ -57,5 +57,9 @@ public:
 
 	void Turninplace();
 
+	//to compensate turn in 90 degree
+	float Rotationyaw;
+	float Rotationyawlastframe;
+
 	//Aturn in place ends here
 };
