@@ -102,7 +102,12 @@ public:
 
 	//@Grab and replace ends
 
+
+	//to check ammo is full and not to reload the gun when ammo is full
+	//@ check ammo
+	bool CheckforReload();
 	
 
+	//@ check ammo ends
 
 };

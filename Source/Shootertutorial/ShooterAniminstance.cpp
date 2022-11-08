@@ -15,6 +15,7 @@ UShooterAniminstance::UShooterAniminstance() {
 	Characteryaw = 0.f;
 	characteryawlastframe = 0.f;
 	Rootoffsetyaw = 0.f;
+	bReloading = false;
 }
 
 void UShooterAniminstance::NativeInitializeAnimation()
@@ -31,6 +32,10 @@ void UShooterAniminstance::UpdatecAnimation(float Deltatime)
 		Shootercharref = Cast<AShootercharacter>(Pawn);
 	}
 	if (Shootercharref) {
+
+		//Pitch value 
+		Pitch = Shootercharref->GetBaseAimRotation().Pitch;
+		bReloading = Shootercharref->getCombatfirestate() == ECombatfirestate::ECFS_reloadstate;
 		FVector Velocity = Shootercharref->GetVelocity();
 		// set to zero for the only movement not the flying or falling
 		Velocity.Z = 0.f;
@@ -92,10 +97,10 @@ void UShooterAniminstance::Turninplace()
 		//else {
 			//UE_LOG(LogTemp, Warning, TEXT("characteryawlast %f"), characteryawlastframe);
 		//}
-		const float yawoffset{ Characteryaw - characteryawlastframe };
+		const float yawoffset{ Characteryaw-characteryawlastframe};
 		//nomalise between the ange 180 ,-180
 		Rootoffsetyaw -= yawoffset;
-		UKismetMathLibrary::ClampAngle(Rootoffsetyaw, -180.f, 180.f);
+		//Rootoffsetyaw = UKismetMathLibrary::NormalizeAxis(Rootoffsetyaw-yawoffset);
 		//Rootoffsetyaw=UKismetMathLibrary::NormalizeAxis(Rootoffsetyaw - yawoffset);
 		FString offsetyaw = FString::Printf(TEXT("characteryaaw:%f"),Characteryaw);
 		FString offsete = FString::Printf(TEXT("characteryaawlast:%f"),characteryawlastframe);
@@ -117,9 +122,9 @@ void UShooterAniminstance::Turninplace()
 			const float Rotationyawoffset{ Rotationyaw - Rotationyawlastframe };
 			//UE_LOG(LogTemp, Warning, TEXT("Rotationyaw%f"), Rotationyaw);
 			//UE_LOG(LogTemp, Warning, TEXT("Rotationyawoffest%f"), Rotationyawoffset);
-			Rootoffsetyaw > 0.f ? Rootoffsetyaw -= Rotationyawoffset : Rootoffsetyaw += Rotationyawoffset;
+			Rootoffsetyaw > 0.f ? Rootoffsetyaw -= Rotationyawoffset : Rootoffsetyaw = Rootoffsetyaw - FMath::Lerp<float, float>(0, Rootoffsetyaw - Rotationyawlastframe,1.0f);
 			const float ABSRootoffsetyaw{ FMath::Abs(Rootoffsetyaw) };
-			if (Rootoffsetyaw > 90.f) {
+			if (ABSRootoffsetyaw > 90.f) {
 				const float yawexcess{ ABSRootoffsetyaw - 90.f };
 				Rootoffsetyaw > 0.f ? Rootoffsetyaw -= yawexcess : Rootoffsetyaw += yawexcess;
 			}

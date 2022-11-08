@@ -86,3 +86,8 @@ void ABaseWeapon::Reloadammocount(int32 Amount)
 	checkf(Ammoavailable + Amount <= Magammocapacity, TEXT("Your are existing capacity of holding Ammo"));
 	Ammoavailable += Amount;
 }
+
+bool ABaseWeapon::CheckforReload()
+{
+	return Ammoavailable >= Magammocapacity;
+}

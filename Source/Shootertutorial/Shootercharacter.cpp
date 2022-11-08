@@ -657,7 +657,7 @@ void AShootercharacter::Reloadweapon() {
 	if (Ecombatfirestate != ECombatfirestate::ECFS_Unoccupied) return;
 	if (EquippedWeapon == nullptr) return;
 	UAnimInstance* Anim = GetMesh()->GetAnimInstance();
-	if (carrysameammo()) {
+	if (carrysameammo() && !EquippedWeapon->CheckforReload()) {
 		Ecombatfirestate = ECombatfirestate::ECFS_reloadstate;
 		//FName sectionname = TEXT("Reloadsmg");
 		if (Anim && Reloadmontage) {

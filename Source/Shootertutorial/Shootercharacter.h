@@ -325,4 +325,7 @@ public:
 
 
 
+	//for HipaimoffsetBlendspace
+	FORCEINLINE ECombatfirestate getCombatfirestate() const { return Ecombatfirestate; }
+
 };//for stting cross hair screen x will be integer positive not negative and same for screen y
