@@ -16,6 +16,10 @@ UShooterAniminstance::UShooterAniminstance() {
 	characteryawlastframe = 0.f;
 	Rootoffsetyaw = 0.f;
 	bReloading = false;
+	//@Lean
+	LeanCharacteryawLastframe = FRotator(0.f);
+	LeanCharacteryaw = FRotator(0.f);
+	YawDelta = 0.f;
 }
 
 void UShooterAniminstance::NativeInitializeAnimation()
@@ -32,7 +36,8 @@ void UShooterAniminstance::UpdatecAnimation(float Deltatime)
 		Shootercharref = Cast<AShootercharacter>(Pawn);
 	}
 	if (Shootercharref) {
-
+		//@Crouch value 
+		bCrouching = Shootercharref->GetCrouchingState();
 		//Pitch value 
 		Pitch = Shootercharref->GetBaseAimRotation().Pitch;
 		bReloading = Shootercharref->getCombatfirestate() == ECombatfirestate::ECFS_reloadstate;
@@ -73,8 +78,25 @@ void UShooterAniminstance::UpdatecAnimation(float Deltatime)
 		}
 		//proerty to change the hip fire to aiming fire function
 		banimaiming = Shootercharref->baimZoom;
+
+		//@ enum spexifiers Estateofffire
+		if (bReloading) {
+			Stateinenum = EStateoffire::ESF_Reload;
+		}
+		else if (bisinair) {
+			Stateinenum = EStateoffire::ESF_Isinair;
+		}
+		else if (Shootercharref->baimZoom) {
+			Stateinenum = EStateoffire::ESF_Aiming;
+		}
+		else {
+			Stateinenum = EStateoffire::ESF_Hip;
+		}
 		//to turn in place 
 		Turninplace();
+
+		//lean while running
+		Lean(Deltatime);
 	}
 }
 
@@ -136,4 +158,16 @@ void UShooterAniminstance::Turninplace()
 		
 	}
 
+}
+
+void UShooterAniminstance::Lean(float Deltatime)
+{
+	if (Shootercharref != nullptr) {
+		LeanCharacteryawLastframe = LeanCharacteryaw;
+		LeanCharacteryaw = Shootercharref->GetActorRotation();
+		const FRotator DeltaRot=UKismetMathLibrary::NormalizedDeltaRotator(LeanCharacteryaw, LeanCharacteryawLastframe);
+		const float Target{ DeltaRot.Yaw / Deltatime };
+		float Rinterp = FMath::FInterpTo(YawDelta, Target, Deltatime, 6.f);
+		YawDelta = FMath::Clamp(Rinterp, -90.f, 90.f);
+	}
 }

@@ -104,6 +104,10 @@ AShootercharacter::AShootercharacter():Baseturnrate(45.f),Baselookuprate(45.f)
 	lefthandbonename=TEXT("Hand_L");
 	Handclipcomponent = CreateDefaultSubobject<USceneComponent>(TEXT("Handclipcomponnet"));
 	camarmrotater= FVector(0.f, 50.f, 80.f);
+
+
+	//@crouching 
+	bCrouching = false;
 }
 
 // Called when the game starts or when spawned
@@ -177,6 +181,9 @@ void AShootercharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	//fuctionality of reloading the weapon
 	PlayerInputComponent->BindAction("Reloadgun", IE_Pressed, this, &AShootercharacter::reloadbuttonpressed);
+
+	//functionality of Crouching button
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AShootercharacter::CrouchButtonPressed);
 
 
 }
@@ -720,14 +727,20 @@ void AShootercharacter::Grabclip()
 		UE_LOG(LogTemp, Warning, TEXT("grab work"));
 	}
 	EquippedWeapon->Setmovingclip(true);
-	Springarm->SocketOffset = FVector(0.f, -150.f,100.f)+camarmrotater;
 }
 
 void AShootercharacter::Replaceclip()
 {
 	EquippedWeapon->Setmovingclip(false);
-	Springarm->SocketOffset = FVector(0.f, 50.f, 80.f);
+}
+//@Grab and replace ends
+
+
+//@Crouch animation Starts here
+void AShootercharacter::CrouchButtonPressed()
+{
+	bCrouching = !bCrouching;
 }
 
-//@Grab and replace ends
+
 

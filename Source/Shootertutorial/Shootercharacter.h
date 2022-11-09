@@ -328,4 +328,15 @@ public:
 	//for HipaimoffsetBlendspace
 	FORCEINLINE ECombatfirestate getCombatfirestate() const { return Ecombatfirestate; }
 
+private:
+	//@Crouching animation Starts 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Crouching", meta = (AllowPrivateAccess = "true"))
+	bool bCrouching;
+
+public:
+	void CrouchButtonPressed();
+
+	FORCEINLINE bool GetCrouchingState() const { return bCrouching; }
+
+
 };//for stting cross hair screen x will be integer positive not negative and same for screen y

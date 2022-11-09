@@ -9,6 +9,20 @@
 /**
  * 
  */
+
+
+UENUM(BlueprintType)
+enum  class EStateoffire :uint8 {
+	ESF_Isinair UMETA(DisplayName="Isinair"),
+	ESF_Aiming UMETA(DisplayName="Aiming"),
+	//normal 
+	ESF_Hip UMETA(DisplayName="Hip"),
+	ESF_Reload UMETA(DisplayName="Reload"),
+
+	ESF_Default UMETA(DisplayName="Default")
+};
+
+
 UCLASS()
 class SHOOTERTUTORIAL_API UShooterAniminstance : public UAnimInstance
 {
@@ -70,4 +84,33 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "turninplace")
 	bool bReloading;
     //................@end
+
+
+
+	//@EStateoffire enum 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AimoffsetBlend")
+	EStateoffire Stateinenum;
+
+
+	//@EStateoffire enum  ENDS
+
+	//@Lean blendspace in running blendspace
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean")
+	float YawDelta;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean")
+    FRotator LeanCharacteryaw;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lean")
+	FRotator LeanCharacteryawLastframe;
+
+	void Lean(float Deltatime);
+
+	//@Lean blendspace in running blendspace ENDS
+
+
+	//@Crouch Animation props Start
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crouch")
+	bool bCrouching;
+	//@Crouch Ends
 };
