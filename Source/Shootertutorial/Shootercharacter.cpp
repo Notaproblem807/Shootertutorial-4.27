@@ -24,7 +24,7 @@
 #include "BaseWeapon.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
-
+#include "Components/CapsuleComponent.h"
 //editdefaultonly will only first choice of editor values
 
 // Sets default values   and when we reduce blend weights in layered blend per bone recoil anim works and additive will cause error
@@ -108,6 +108,17 @@ AShootercharacter::AShootercharacter():Baseturnrate(45.f),Baselookuprate(45.f)
 
 	//@crouching 
 	bCrouching = false;
+
+
+	//@Crouch Blend Space
+	MaxWalkSpeed = 600.f;
+	MaxCrouchSpeed = 300.f;
+	CrouchCapsuleHeight = 44.f;
+	StandCapsuleHeight = 88.f;
+	//friction
+    BaseGroundfriction = 2.0f;
+	BaseCrouchFriction = 100.f;
+
 }
 
 // Called when the game starts or when spawned
@@ -127,7 +138,7 @@ void AShootercharacter::BeginPlay()
 	//@Ammomap initialize
 	InitializeAmmomap();
 	//@Ammomap end
-	
+	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
 }
 
 // Called every frame
@@ -150,6 +161,12 @@ void AShootercharacter::Tick(float DeltaTime)
 	//for tracing the weapon in world
 	traceintick();
 	//..................................................
+
+
+	//For interpolating the Capsule height between the crouch and standing
+	InterpCapsuleHeight(DeltaTime);
+
+
 }
 
 // Called to bind functionality to input
@@ -164,7 +181,7 @@ void AShootercharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	//default are changed to our func 
 	PlayerInputComponent->BindAxis("mouseturn", this, &AShootercharacter::mouseturn);
 	PlayerInputComponent->BindAxis("mouselookup", this, &AShootercharacter::mouselookup);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AShootercharacter::Jumpstate);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	//functionality to shoot the bullet 
@@ -740,7 +757,47 @@ void AShootercharacter::Replaceclip()
 void AShootercharacter::CrouchButtonPressed()
 {
 	bCrouching = !bCrouching;
+	if (bCrouching) {
+		GetCharacterMovement()->MaxWalkSpeed = MaxCrouchSpeed;
+		GetCharacterMovement()->GroundFriction = BaseCrouchFriction;
+	}
+	else {
+		GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+		GetCharacterMovement()->GroundFriction = BaseGroundfriction;
+	}
 }
+
+//@Crouch animation ENDs
+
+
+//@Crouch Strafing blend 
+void AShootercharacter::InterpCapsuleHeight(float Deltatime)
+{
+	
+	const float CurrentCapsuleheight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	if (bCrouching) {
+		CurrentCapsuleHalfheight=FMath::FInterpTo(CurrentCapsuleheight, CrouchCapsuleHeight, Deltatime, 6.f);
+	}
+	else {
+		CurrentCapsuleHalfheight=FMath::FInterpTo(CurrentCapsuleheight, StandCapsuleHeight, Deltatime, 6.f);
+	}
+	GetCapsuleComponent()->SetCapsuleHalfHeight(CurrentCapsuleHalfheight);
+	const float DiffHeight = CurrentCapsuleheight - CurrentCapsuleHalfheight;
+	GetMesh()->AddLocalOffset(FVector(0.f, 0.f, DiffHeight));
+}
+
+void AShootercharacter::Jumpstate()
+{
+	if (bCrouching) {
+		bCrouching = false;
+	}
+	else {
+		ACharacter::Jump();
+	}
+}
+
+
+//@Crouch Strafing ENDS
 
 
 

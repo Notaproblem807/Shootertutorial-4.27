@@ -20,6 +20,9 @@ UShooterAniminstance::UShooterAniminstance() {
 	LeanCharacteryawLastframe = FRotator(0.f);
 	LeanCharacteryaw = FRotator(0.f);
 	YawDelta = 0.f;
+	//@BlendWeights
+	bTurninplace = false;
+	BlendWeights = 1.0f;
 }
 
 void UShooterAniminstance::NativeInitializeAnimation()
@@ -119,24 +122,25 @@ void UShooterAniminstance::Turninplace()
 		//else {
 			//UE_LOG(LogTemp, Warning, TEXT("characteryawlast %f"), characteryawlastframe);
 		//}
-		const float yawoffset{ Characteryaw-characteryawlastframe};
+		const float yawoffset{ Characteryaw - characteryawlastframe };
 		//nomalise between the ange 180 ,-180
 		Rootoffsetyaw -= yawoffset;
 		//Rootoffsetyaw = UKismetMathLibrary::NormalizeAxis(Rootoffsetyaw-yawoffset);
 		//Rootoffsetyaw=UKismetMathLibrary::NormalizeAxis(Rootoffsetyaw - yawoffset);
-		FString offsetyaw = FString::Printf(TEXT("characteryaaw:%f"),Characteryaw);
-		FString offsete = FString::Printf(TEXT("characteryaawlast:%f"),characteryawlastframe);
-		FString offsetr = FString::Printf(TEXT("rootoff:%f"),Rootoffsetyaw);
+		FString offsetyaw = FString::Printf(TEXT("characteryaaw:%f"), Characteryaw);
+		FString offsete = FString::Printf(TEXT("characteryaawlast:%f"), characteryawlastframe);
+		FString offsetr = FString::Printf(TEXT("rootoff:%f"), Rootoffsetyaw);
 		if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(1,0.f, FColor::Red, offsetyaw);
-			GEngine->AddOnScreenDebugMessage(2, 0.f, FColor::Green,offsete);
-			GEngine->AddOnScreenDebugMessage(3, 0.f, FColor::Purple,offsetr);
+			GEngine->AddOnScreenDebugMessage(1, 0.f, FColor::Red, offsetyaw);
+			GEngine->AddOnScreenDebugMessage(2, 0.f, FColor::Green, offsete);
+			GEngine->AddOnScreenDebugMessage(3, 0.f, FColor::Purple, offsetr);
 
 		}
 		//turn in 90 while moving turn the body 
 		const float trackerval{ GetCurveValue(TEXT("trackerval")) };
 		//if trackerval > 0 not  animation not running turn in anim
-		if (trackerval>0) {
+		if (trackerval > 0) {
+			bTurninplace = true;
 			Rotationyawlastframe = Rotationyaw;
 			Rotationyaw = GetCurveValue(TEXT("Rotationturn"));
 			//UE_LOG(LogTemp, Warning, TEXT("Rotationyaw%f"), Rotationyaw);
@@ -144,7 +148,7 @@ void UShooterAniminstance::Turninplace()
 			const float Rotationyawoffset{ Rotationyaw - Rotationyawlastframe };
 			//UE_LOG(LogTemp, Warning, TEXT("Rotationyaw%f"), Rotationyaw);
 			//UE_LOG(LogTemp, Warning, TEXT("Rotationyawoffest%f"), Rotationyawoffset);
-			Rootoffsetyaw > 0.f ? Rootoffsetyaw -= Rotationyawoffset : Rootoffsetyaw = Rootoffsetyaw - FMath::Lerp<float, float>(0, Rootoffsetyaw - Rotationyawlastframe,1.0f);
+			Rootoffsetyaw > 0.f ? Rootoffsetyaw -= Rotationyawoffset : Rootoffsetyaw = Rootoffsetyaw - FMath::Lerp<float, float>(0, Rootoffsetyaw - Rotationyawlastframe, 1.0f);
 			const float ABSRootoffsetyaw{ FMath::Abs(Rootoffsetyaw) };
 			if (ABSRootoffsetyaw > 90.f) {
 				const float yawexcess{ ABSRootoffsetyaw - 90.f };
@@ -152,12 +156,21 @@ void UShooterAniminstance::Turninplace()
 			}
 			UE_LOG(LogTemp, Warning, TEXT("finRotation%f"), Rootoffsetyaw);
 		}
-		else {
-			UE_LOG(LogTemp, Warning, TEXT("newRotation%f"), Rootoffsetyaw);
+		if (bTurninplace) {
+			if (bCrouching) {
+				BlendWeights = 0.1f;
+			}
+			else if (bisinair) {
+				BlendWeights = 0.3f;
+			}
+			else {
+				BlendWeights = 0.2f;
+			}
 		}
-		
+		else {
+			BlendWeights = 1.f;
+		}
 	}
-
 }
 
 void UShooterAniminstance::Lean(float Deltatime)

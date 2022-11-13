@@ -339,4 +339,23 @@ public:
 	FORCEINLINE bool GetCrouchingState() const { return bCrouching; }
 
 
+	//@crouch Walk Anim blend space props Start
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Walkspeed")
+	float MaxWalkSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CrouchWalkSpeed")
+	float MaxCrouchSpeed;
+	float CurrentCapsuleHalfheight;
+	float StandCapsuleHeight;
+	float CrouchCapsuleHeight;
+
+	float BaseGroundfriction;
+	float BaseCrouchFriction;
+
+	//interp the Capsule Height when Crouch to Standing
+	void InterpCapsuleHeight(float Deltatime);
+
+	void Jumpstate();
+	//@Crouch walk Ends
+
+
 };//for stting cross hair screen x will be integer positive not negative and same for screen y

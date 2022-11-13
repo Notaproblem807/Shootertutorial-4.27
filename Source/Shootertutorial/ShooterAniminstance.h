@@ -113,4 +113,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crouch")
 	bool bCrouching;
 	//@Crouch Ends
+
+	//@Weights in layerd bone for turn in place and reload and crouch
+	bool bTurninplace;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BlendWeights")
+	float BlendWeights;
+	//@Weights ENDS
 };
