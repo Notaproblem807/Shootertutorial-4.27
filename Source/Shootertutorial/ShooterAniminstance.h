@@ -120,4 +120,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BlendWeights")
 	float BlendWeights;
 	//@Weights ENDS
+
+	//@Sprint Start
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sprinting")
+	bool bSprinting;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sprinting")
+    float Forward;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sprinting")
+	float Right;
+
+	//@Sprint Ends
 };

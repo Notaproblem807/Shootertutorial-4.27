@@ -358,4 +358,19 @@ public:
 	//@Crouch walk Ends
 
 
+	//@Sprint Animation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sprint")
+	bool bSprint;
+	void SprintPressed();
+
+	//Sub to rotate the character along the camera
+	bool bRoll{ true };
+
+	//for checking forward and right value
+	float Forward;
+	float Right;
+
+	//@Sprint Ends
+
+
 };//for stting cross hair screen x will be integer positive not negative and same for screen y

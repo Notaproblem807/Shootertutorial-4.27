@@ -41,6 +41,10 @@ void UShooterAniminstance::UpdatecAnimation(float Deltatime)
 	if (Shootercharref) {
 		//@Crouch value 
 		bCrouching = Shootercharref->GetCrouchingState();
+		//@Sprint value
+		bSprinting = Shootercharref->bSprint;
+		Forward = Shootercharref->Forward;
+		Right = Shootercharref->Right;
 		//Pitch value 
 		Pitch = Shootercharref->GetBaseAimRotation().Pitch;
 		bReloading = Shootercharref->getCombatfirestate() == ECombatfirestate::ECFS_reloadstate;
@@ -48,6 +52,10 @@ void UShooterAniminstance::UpdatecAnimation(float Deltatime)
 		// set to zero for the only movement not the flying or falling
 		Velocity.Z = 0.f;
 		speed = Velocity.Size();
+		if (speed == 0.f) {
+			//set Sprinting false
+			Shootercharref->bSprint = false;
+		}
 		//checking for jumping
 		bisinair = Shootercharref->GetCharacterMovement()->IsFalling();
 		//checking that character is not idle

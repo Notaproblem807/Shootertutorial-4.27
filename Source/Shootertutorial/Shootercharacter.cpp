@@ -46,7 +46,7 @@ AShootercharacter::AShootercharacter():Baseturnrate(45.f),Baselookuprate(45.f)
 
 	//controller rotation not to affect character
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationRoll = true;//turning true will not rotate the mesh
+	bUseControllerRotationRoll = bRoll;//turning true will not rotate the mesh
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement =false;//going to blend with blend space
 	GetCharacterMovement()->AirControl = 0.2f;
@@ -119,6 +119,12 @@ AShootercharacter::AShootercharacter():Baseturnrate(45.f),Baselookuprate(45.f)
     BaseGroundfriction = 2.0f;
 	BaseCrouchFriction = 100.f;
 
+	//Sprint
+	bSprint = false;
+
+
+
+
 }
 
 // Called when the game starts or when spawned
@@ -139,6 +145,10 @@ void AShootercharacter::BeginPlay()
 	InitializeAmmomap();
 	//@Ammomap end
 	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+
+	//@ignore The weapon collision
+	GetCapsuleComponent()->IgnoreActorWhenMoving(EquippedWeapon, true);
+	GetCapsuleComponent()->IgnoreActorWhenMoving(this, true);
 }
 
 // Called every frame
@@ -202,22 +212,31 @@ void AShootercharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	//functionality of Crouching button
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AShootercharacter::CrouchButtonPressed);
 
+	//functionality of Sprint button
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AShootercharacter::SprintPressed);
+
 
 }
 
 void AShootercharacter::Moveforward(float Value)
 {
+	FVector Direction;
 	if ((Controller != nullptr) && (Value != 0.f)) {
+		Forward = Value;
 		const FRotator Rotation{ Controller->GetControlRotation() };
 		const FRotator Yawrotation{ FRotator(0.f,Rotation.Yaw,0.f) };
-		FVector Direction = FRotationMatrix(Yawrotation).GetUnitAxis(EAxis::X);
+		Direction = FRotationMatrix(Yawrotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
+	}
+	if (bSprint) {
+			AddMovementInput(GetActorForwardVector(), 5.f);
 	}
 }
 
 void AShootercharacter::Moveright(float Value)
 {
 	if ((Controller != nullptr) && (Value != 0.f)) {
+		Right = Value;
 		const FRotator Rotation{ Controller->GetControlRotation() };
 		const FRotator Yawrotation{ FRotator(0.f,Rotation.Yaw,0.f) };
 		FVector Direction{ FRotationMatrix(Yawrotation).GetUnitAxis(EAxis::Y) };
@@ -547,7 +566,9 @@ void AShootercharacter::IncrementItemcount(int8 Amount)
 
 void AShootercharacter::Aimzoomgunpress()
 {
-	baimZoom = true;
+	if (!bSprint) {
+		baimZoom = true;
+	}
 	//for prototyping purpose only
 	//getCamera()->SetFieldOfView(Zoomedview);
 }
@@ -622,7 +643,7 @@ void AShootercharacter::crossspreaddef()
 void AShootercharacter::Firebuttonpressed()
 {
 	bfirebuttonpress = true;
-	if (WeaponhasAmmo()) {
+	if (WeaponhasAmmo() && !bSprint) {
 		Shootingfunc();
 	}
 }
@@ -760,6 +781,8 @@ void AShootercharacter::CrouchButtonPressed()
 	if (bCrouching) {
 		GetCharacterMovement()->MaxWalkSpeed = MaxCrouchSpeed;
 		GetCharacterMovement()->GroundFriction = BaseCrouchFriction;
+		//sprint to be offed to play anim from sprint to crouching
+		bSprint = false;
 	}
 	else {
 		GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
@@ -798,6 +821,23 @@ void AShootercharacter::Jumpstate()
 
 
 //@Crouch Strafing ENDS
+
+//@Sprint
+void AShootercharacter::SprintPressed()
+{
+	bSprint = !bSprint;
+	bRoll = !bRoll;
+	bUseControllerRotationRoll = bRoll;
+	//to play animation from crouch to sprint
+	if (bSprint) {
+		bCrouching = false;
+		GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+	}
+}
+
+//@Sprint ends
+
+
 
 
 
